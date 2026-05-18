@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Avatar,
   Box,
   Card,
   CardContent,
@@ -17,6 +16,7 @@ import {
 } from '@mui/material';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusChip } from '@/components/common/StatusChip';
+import { AvatarUploader } from '@/components/common/AvatarUploader';
 import { employeesApi } from '@/api/employees.api';
 import type { EmployeeDto } from '@/types/models';
 import {
@@ -84,19 +84,15 @@ export function ProfilePage() {
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
-              <Avatar
-                sx={{
-                  width: 96,
-                  height: 96,
-                  fontSize: 32,
-                  mx: 'auto',
-                  mb: 2,
-                  bgcolor: 'primary.main',
-                }}
-              >
-                {profile.firstName.charAt(0)}
-                {profile.lastName.charAt(0)}
-              </Avatar>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <AvatarUploader
+                  employee={profile}
+                  size={120}
+                  onChange={(photoUrl) =>
+                    setProfile((prev) => (prev ? { ...prev, photoUrl } : prev))
+                  }
+                />
+              </Box>
               <Typography variant="h6">{formatFullName(profile)}</Typography>
               <Typography variant="body2" color="text.secondary">
                 {user?.email}

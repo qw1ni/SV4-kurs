@@ -1,10 +1,14 @@
+import fs from 'fs';
+import path from 'path';
 import { Router } from 'express';
+import type { Request } from 'express';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { requireAuth, requireRole } from '../middleware/auth';
-import { forbidden, notFound } from '../utils/http';
+import { uploadAvatar, UPLOAD_ROOT } from '../middleware/upload';
+import { badRequest, forbidden, notFound } from '../utils/http';
 
 const router = Router();
 
@@ -234,6 +238,82 @@ router.delete(
   asyncHandler(async (req, res) => {
     const docId = Number(req.params.docId);
     await prisma.employeeDocument.delete({ where: { id: docId } });
+    res.status(204).end();
+  })
+);
+
+// Проверка прав на изменение фото: HR — любой сотрудник, EMPLOYEE — только своя карточка
+async function ensureAvatarPermission(req: Request, id: number): Promise<void> {
+  if (req.auth!.role === 'HR_MANAGER') return;
+  const self = await prisma.employee.findFirst({ where: { userId: req.auth!.userId } });
+  if (!self || self.id !== id) throw forbidden('Можно менять только своё фото');
+}
+
+function removeFileByUrl(photoUrl: string | null | undefined) {
+  if (!photoUrl) return;
+  if (!photoUrl.startsWith('/uploads/')) return;
+  const relative = photoUrl.replace(/^\/uploads\//, '');
+  const abs = path.join(UPLOAD_ROOT, relative);
+  // Защита от path traversal — итоговый путь должен лежать внутри UPLOAD_ROOT
+  if (!abs.startsWith(UPLOAD_ROOT)) return;
+  fs.promises.unlink(abs).catch(() => undefined);
+}
+
+router.post(
+  '/:id/photo',
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    const employee = await prisma.employee.findUnique({ where: { id } });
+    if (!employee) throw notFound('Сотрудник не найден');
+    await ensureAvatarPermission(req, id);
+
+    await new Promise<void>((resolve, reject) => {
+      uploadAvatar(req, res, (err) => (err ? reject(err) : resolve()));
+    });
+    if (!req.file) throw badRequest('Файл не получен');
+
+    // Удаляем предыдущий файл, если был
+    removeFileByUrl(employee.photoUrl);
+
+    const photoUrl = `/uploads/avatars/${req.file.filename}`;
+    const updated = await prisma.employee.update({
+      where: { id },
+      data: { photoUrl },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        userId: req.auth!.userId,
+        action: 'UPLOAD_PHOTO',
+        entity: 'employees',
+        entityId: id,
+      },
+    });
+
+    res.json({ photoUrl: updated.photoUrl });
+  })
+);
+
+router.delete(
+  '/:id/photo',
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    const employee = await prisma.employee.findUnique({ where: { id } });
+    if (!employee) throw notFound('Сотрудник не найден');
+    await ensureAvatarPermission(req, id);
+
+    removeFileByUrl(employee.photoUrl);
+    await prisma.employee.update({ where: { id }, data: { photoUrl: null } });
+
+    await prisma.auditLog.create({
+      data: {
+        userId: req.auth!.userId,
+        action: 'DELETE_PHOTO',
+        entity: 'employees',
+        entityId: id,
+      },
+    });
+
     res.status(204).end();
   })
 );

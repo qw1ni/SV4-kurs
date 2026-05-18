@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -18,6 +17,7 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
+import { AvatarUploader } from '@/components/common/AvatarUploader';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -99,19 +99,15 @@ export function EmployeeDetailPage() {
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
-              <Avatar
-                sx={{
-                  width: 96,
-                  height: 96,
-                  fontSize: 32,
-                  mx: 'auto',
-                  mb: 2,
-                  bgcolor: 'primary.main',
-                }}
-              >
-                {employee.firstName.charAt(0)}
-                {employee.lastName.charAt(0)}
-              </Avatar>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <AvatarUploader
+                  employee={employee}
+                  size={120}
+                  onChange={(photoUrl) =>
+                    setEmployee((prev) => (prev ? { ...prev, photoUrl } : prev))
+                  }
+                />
+              </Box>
               <Typography variant="h6">{formatFullName(employee)}</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 ID #{employee.id}

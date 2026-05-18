@@ -1,8 +1,8 @@
 import { ReactNode, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { EmployeeAvatar } from '@/components/common/EmployeeAvatar';
 import {
   AppBar,
-  Avatar,
   Badge,
   Box,
   CssBaseline,
@@ -174,9 +174,11 @@ export function AppLayout() {
             </IconButton>
           </Tooltip>
           <IconButton onClick={(e) => setAnchor(e.currentTarget)} sx={{ ml: 1 }}>
-            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-              {user?.employee?.firstName?.charAt(0) ?? user?.email?.charAt(0).toUpperCase() ?? '?'}
-            </Avatar>
+            <EmployeeAvatar
+              employee={user?.employee}
+              fallbackText={user?.email?.charAt(0).toUpperCase() ?? '?'}
+              sx={{ width: 32, height: 32 }}
+            />
           </IconButton>
           <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
             <MenuItem disabled>

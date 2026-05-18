@@ -46,4 +46,17 @@ export const employeesApi = {
   async removeDocument(employeeId: number, docId: number) {
     await apiClient.delete(`/employees/${employeeId}/documents/${docId}`);
   },
+  async uploadPhoto(employeeId: number, file: File) {
+    const fd = new FormData();
+    fd.append('photo', file);
+    const { data } = await apiClient.post<{ photoUrl: string }>(
+      `/employees/${employeeId}/photo`,
+      fd,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    return data;
+  },
+  async deletePhoto(employeeId: number) {
+    await apiClient.delete(`/employees/${employeeId}/photo`);
+  },
 };

@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import { env } from './config/env';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
+import { UPLOAD_ROOT } from './middleware/upload';
 
 export function createApp() {
   const app = express();
@@ -16,6 +17,9 @@ export function createApp() {
   );
   app.use(express.json({ limit: '2mb' }));
   app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+  // Статика для загруженных файлов (аватары и т.д.)
+  app.use('/uploads', express.static(UPLOAD_ROOT, { maxAge: '7d' }));
 
   app.use('/api', routes);
 

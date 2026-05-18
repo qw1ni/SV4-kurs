@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -24,6 +23,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { EmployeeAvatar } from '@/components/common/EmployeeAvatar';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import AddIcon from '@mui/icons-material/Add';
@@ -299,10 +299,10 @@ export function EmployeesPage() {
                   return (
                     <TableRow key={e.id} hover>
                       <TableCell>
-                        <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.main', fontSize: 14 }}>
-                          {e.firstName.charAt(0)}
-                          {e.lastName.charAt(0)}
-                        </Avatar>
+                        <EmployeeAvatar
+                          employee={e}
+                          sx={{ width: 36, height: 36, fontSize: 14 }}
+                        />
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
