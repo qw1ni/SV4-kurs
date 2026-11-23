@@ -3,6 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "description": "Онлайн-платформа для управления штатным расписанием организации",
+  "author": "Петров М. А.",
+  "license": "SEE LICENSE IN LICENSE",
   "workspaces": [
     "server",
     "client"

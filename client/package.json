@@ -1,6 +1,8 @@
 {
   "name": "client",
   "version": "1.0.0",
+  "author": "Петров М. А.",
+  "license": "SEE LICENSE IN ../LICENSE",
   "private": true,
   "type": "module",
   "scripts": {

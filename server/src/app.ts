@@ -1,3 +1,9 @@
+/*
+ * ШтатПлан — платформа управления штатным расписанием организации
+ * Copyright (c) 2026 Петров М. А. Все права защищены.
+ * SPDX-License-Identifier: LicenseRef-StaffPlan-Community-EULA
+ * Бесплатное использование в пределах раздела 2 соглашения LICENSE в корне репозитория.
+ */
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
